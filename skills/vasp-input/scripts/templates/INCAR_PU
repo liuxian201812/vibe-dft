@@ -1,0 +1,7 @@
+DFT+U Calculation
+LDAU    = .TRUE.        (Activate DFT+U)
+LDAUTYPE=  2            (Dudarev, only U-J matters)
+LDAUL   =  {ldaul}         (Orbitals for each species)
+LDAUU   =  {ldauu}         (U for each species)
+LDAUJ   =  {ldauj}         (J for each species)
+LMAXMIX =  {lmaxmix}         (Mixing cut-off, 4-d, 6-f)

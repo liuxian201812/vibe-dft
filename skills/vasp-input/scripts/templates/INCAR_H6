@@ -1,0 +1,5 @@
+HSE06 Calculation
+LHFCALC = .TRUE.       (Activate HF/exact exchange)
+AEXX   =  0.25         (Fraction of exact exchange)
+HFSCREEN= 0.2          (Screening parameter for HSE06)
+ALGO   =  Normal        (Electronic minimisation algorithm)
