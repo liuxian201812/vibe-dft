@@ -1,0 +1,20 @@
+name: smoke-test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run smoke test
+        run: bash smoke_tests/run_smoke_test.sh
+      - name: Run sensitive text scan
+        run: bash tools/check_no_site_details.sh

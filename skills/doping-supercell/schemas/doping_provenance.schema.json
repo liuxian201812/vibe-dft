@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:doping-supercell:doping-provenance:v1",
+  "title": "Doped Supercell Provenance v1 (legacy compatibility)",
+  "type": "object",
+  "required": [
+    "schema",
+    "artifact_type",
+    "status",
+    "stage",
+    "source_manifest",
+    "parent",
+    "pristine_supercell",
+    "supercell_matrix",
+    "substitution",
+    "validation",
+    "doped_supercell"
+  ],
+  "properties": {
+    "schema": {
+      "const": "doping-supercell.doping-provenance/v1"
+    },
+    "artifact_type": {
+      "const": "doped_supercell"
+    },
+    "status": {
+      "const": "passed"
+    },
+    "stage": {
+      "const": "dope"
+    },
+    "source_manifest": {
+      "type": "object",
+      "required": ["path", "sha256", "schema"]
+    },
+    "substitution": {
+      "type": "object",
+      "required": [
+        "from",
+        "to",
+        "input_supercell_site_1based",
+        "input_supercell_site_0based",
+        "mapped_parent_site",
+        "parent_wyckoff",
+        "mapping_distance_A",
+        "output_site_1based"
+      ]
+    },
+    "validation": {
+      "type": "object",
+      "required": ["passed"],
+      "properties": {
+        "passed": {"const": true}
+      }
+    }
+  },
+  "additionalProperties": true
+}

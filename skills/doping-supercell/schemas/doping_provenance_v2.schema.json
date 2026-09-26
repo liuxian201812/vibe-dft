@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:doping-supercell:doping-provenance:v2",
+  "title": "Doped Supercell Provenance v2",
+  "type": "object",
+  "required": [
+    "schema", "artifact_type", "status", "stage", "source_manifest",
+    "parent", "pristine_supercell", "supercell_matrix", "substitution",
+    "validation", "doped_supercell"
+  ],
+  "properties": {
+    "schema": {"const": "doping-supercell.doping-provenance/v2"},
+    "artifact_type": {"const": "doped_supercell"},
+    "status": {"const": "passed"},
+    "stage": {"const": "dope"},
+    "source_manifest": {
+      "type": "object",
+      "required": ["path", "sha256", "schema"]
+    },
+    "substitution": {
+      "type": "object",
+      "required": [
+        "from", "to", "resolved_supercell_site_1based",
+        "resolved_supercell_site_0based", "mapped_parent_site",
+        "parent_wyckoff", "mapping_distance_A", "output_site_1based",
+        "site_selection"
+      ],
+      "properties": {
+        "input_index_base": {"enum": [0, 1]},
+        "input_supercell_site_1based": {"type": "integer", "minimum": 1},
+        "input_supercell_site_0based": {"type": "integer", "minimum": 0},
+        "resolved_supercell_site_1based": {"type": "integer", "minimum": 1},
+        "resolved_supercell_site_0based": {"type": "integer", "minimum": 0},
+        "site_selection": {
+          "type": "object",
+          "required": [
+            "mode", "mode_defaulted", "candidate_enumeration_performed",
+            "explicit_site_preserved", "center_fractional_coordinate",
+            "ranking_distance_definition", "periodic_diagnostic_definition",
+            "resolved_supercell_site_1based", "resolved_supercell_site_0based",
+            "resolved_direct_distance_to_center_A",
+            "resolved_periodic_shortest_image_distance_to_center_A"
+          ],
+          "properties": {
+            "mode": {"enum": ["explicit_site", "nearest_supercell_center"]},
+            "mode_defaulted": {"type": "boolean"},
+            "candidate_enumeration_performed": {"type": "boolean"},
+            "explicit_site_preserved": {"type": "boolean"},
+            "center_fractional_coordinate": {
+              "type": "array",
+              "prefixItems": [{"const": 0.5}, {"const": 0.5}, {"const": 0.5}],
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "ranking_distance_definition": {"type": "string", "minLength": 1},
+            "periodic_diagnostic_definition": {"type": "string", "minLength": 1},
+            "resolved_supercell_site_1based": {"type": "integer", "minimum": 1},
+            "resolved_supercell_site_0based": {"type": "integer", "minimum": 0},
+            "resolved_direct_distance_to_center_A": {"type": "number", "minimum": 0},
+            "resolved_periodic_shortest_image_distance_to_center_A": {
+              "type": "number", "minimum": 0
+            },
+            "selected_site_diagnostics": {"$ref": "#/$defs/centerDistanceRecord"},
+            "tie_break": {
+              "type": "object",
+              "required": ["rule", "distance_tolerance_A", "tied_candidate_sites_1based"]
+            },
+            "candidate_count": {"type": "integer", "minimum": 1},
+            "candidates": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/candidate"}
+            }
+          },
+          "allOf": [
+            {
+              "if": {"properties": {"mode": {"const": "explicit_site"}}},
+              "then": {
+                "required": ["selected_site_diagnostics"],
+                "properties": {
+                  "mode_defaulted": {"const": false},
+                  "candidate_enumeration_performed": {"const": false},
+                  "explicit_site_preserved": {"const": true}
+                },
+                "not": {
+                  "anyOf": [
+                    {"required": ["candidates"]},
+                    {"required": ["candidate_count"]},
+                    {"required": ["tie_break"]}
+                  ]
+                }
+              }
+            },
+            {
+              "if": {"properties": {"mode": {"const": "nearest_supercell_center"}}},
+              "then": {
+                "required": ["tie_break", "candidate_count", "candidates"],
+                "properties": {
+                  "candidate_enumeration_performed": {"const": true},
+                  "explicit_site_preserved": {"const": false}
+                }
+              }
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "site_selection": {
+                "properties": {"mode": {"const": "explicit_site"}},
+                "required": ["mode"]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "input_index_base", "input_supercell_site_1based",
+              "input_supercell_site_0based"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "site_selection": {
+                "properties": {"mode": {"const": "nearest_supercell_center"}},
+                "required": ["mode"]
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {"required": ["input_index_base"]},
+                {"required": ["input_supercell_site_1based"]},
+                {"required": ["input_supercell_site_0based"]}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "validation": {
+      "type": "object",
+      "required": ["passed"],
+      "properties": {"passed": {"const": true}}
+    }
+  },
+  "$defs": {
+    "centerDistanceRecord": {
+      "type": "object",
+      "required": [
+        "site_1based", "site_0based", "fractional_coordinate",
+        "direct_center_displacement_fractional",
+        "direct_center_displacement_cartesian_A", "direct_distance_to_center_A",
+        "periodic_nearest_image_translation",
+        "periodic_center_displacement_fractional",
+        "periodic_center_displacement_cartesian_A",
+        "periodic_shortest_image_distance_to_center_A"
+      ]
+    },
+    "candidate": {
+      "allOf": [
+        {"$ref": "#/$defs/centerDistanceRecord"},
+        {
+          "type": "object",
+          "required": [
+            "species", "mapped_parent_site_1based", "mapped_parent_wyckoff",
+            "mapping_distance_A"
+          ]
+        }
+      ]
+    }
+  },
+  "additionalProperties": true
+}

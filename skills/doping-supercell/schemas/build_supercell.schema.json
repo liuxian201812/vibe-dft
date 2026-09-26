@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:doping-supercell:build-config:v1",
+  "title": "Doping Supercell Stage-1 Build Config",
+  "type": "object",
+  "required": [
+    "mode",
+    "output"
+  ],
+  "properties": {
+    "mode": {
+      "enum": [
+        "auto",
+        "explicit"
+      ]
+    },
+    "parent_poscar": {
+      "type": "string",
+      "minLength": 1
+    },
+    "poscar": {
+      "type": "string",
+      "minLength": 1
+    },
+    "supercell_matrix": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": {
+          "type": "integer"
+        }
+      }
+    },
+    "min_atoms": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "min_image_distance": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "checks": {
+      "$ref": "#/$defs/checks"
+    },
+    "output": {
+      "type": "string",
+      "minLength": 1
+    },
+    "manifest": {
+      "type": "string",
+      "minLength": 1
+    },
+    "manifest_json": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "parent_poscar"
+      ],
+      "not": {
+        "required": [
+          "poscar"
+        ]
+      }
+    },
+    {
+      "required": [
+        "poscar"
+      ],
+      "not": {
+        "required": [
+          "parent_poscar"
+        ]
+      }
+    }
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "auto"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "min_atoms",
+          "min_image_distance"
+        ],
+        "not": {
+          "required": [
+            "supercell_matrix"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "explicit"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "supercell_matrix"
+        ],
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "min_atoms"
+              ]
+            },
+            {
+              "required": [
+                "min_image_distance"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "checks": {
+      "type": "object",
+      "properties": {
+        "formula": {
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "atoms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "species_order": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,381 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:doping-supercell:dope-config:v1",
+  "title": "Doping Supercell Stage-2 Config",
+  "type": "object",
+  "required": [
+    "output",
+    "checks"
+  ],
+  "properties": {
+    "supercell_manifest": {
+      "type": "string",
+      "minLength": 1
+    },
+    "manifest": {
+      "type": "string",
+      "minLength": 1
+    },
+    "manifest_json": {
+      "type": "string",
+      "minLength": 1
+    },
+    "supercell_poscar": {
+      "type": "string",
+      "minLength": 1
+    },
+    "supercell": {
+      "type": "string",
+      "minLength": 1
+    },
+    "poscar": {
+      "type": "string",
+      "minLength": 1
+    },
+    "parent_poscar": {
+      "type": "string",
+      "minLength": 1
+    },
+    "substitution": {
+      "$ref": "#/$defs/substitution"
+    },
+    "substitutions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "$ref": "#/$defs/substitution"
+      }
+    },
+    "checks": {
+      "type": "object",
+      "required": [
+        "formula",
+        "atoms",
+        "species_order"
+      ],
+      "properties": {
+        "formula": {
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "atoms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "species_order": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "output": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    },
+    "report": {
+      "type": "string",
+      "minLength": 1
+    },
+    "report_json": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "not": {
+    "anyOf": [
+      {
+        "required": [
+          "mode"
+        ]
+      },
+      {
+        "required": [
+          "supercell_matrix"
+        ]
+      },
+      {
+        "required": [
+          "min_atoms"
+        ]
+      },
+      {
+        "required": [
+          "min_image_distance"
+        ]
+      }
+    ]
+  },
+  "$defs": {
+    "parentSite": {
+      "type": "object",
+      "required": [
+        "wyckoff"
+      ],
+      "properties": {
+        "index_1based": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "index_0based": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "wyckoff": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fractional_coordinate": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number"
+          }
+        },
+        "mapping_tolerance": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "symprec": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "index_1based"
+          ],
+          "not": {
+            "required": [
+              "index_0based"
+            ]
+          }
+        },
+        {
+          "required": [
+            "index_0based"
+          ],
+          "not": {
+            "required": [
+              "index_1based"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": true
+    },
+    "substitution": {
+      "type": "object",
+      "required": [
+        "from",
+        "to",
+        "parent_site"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1
+        },
+        "site_1based": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "site_0based": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "parent_site": {
+          "$ref": "#/$defs/parentSite"
+        },
+        "site_selection": {
+          "type": "string",
+          "const": "nearest_supercell_center",
+          "default": "nearest_supercell_center",
+          "description": "Automatically choose, among all supercell translations matching from/parent_site/Wyckoff constraints, the site with the smallest direct Cartesian distance inside the written POSCAR parallelepiped to frac=(0.5,0.5,0.5), without periodic wrapping. If site_1based and site_0based are both omitted this mode is the runtime default. Periodic shortest-image distance is provenance diagnostics only."
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "site_1based"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "site_0based"
+                ]
+              },
+              {
+                "required": [
+                  "site_selection"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "site_0based"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "site_1based"
+                ]
+              },
+              {
+                "required": [
+                  "site_selection"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "site_1based"
+                ]
+              },
+              {
+                "required": [
+                  "site_0based"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "sites"
+            ]
+          },
+          {
+            "required": [
+              "count"
+            ]
+          },
+          {
+            "required": [
+              "all"
+            ]
+          }
+        ]
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "oneOf": [
+        {
+          "required": [
+            "supercell_manifest"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "manifest"
+                ]
+              },
+              {
+                "required": [
+                  "manifest_json"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "manifest"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "supercell_manifest"
+                ]
+              },
+              {
+                "required": [
+                  "manifest_json"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "manifest_json"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "supercell_manifest"
+                ]
+              },
+              {
+                "required": [
+                  "manifest"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "oneOf": [
+        {
+          "required": [
+            "substitution"
+          ],
+          "not": {
+            "required": [
+              "substitutions"
+            ]
+          }
+        },
+        {
+          "required": [
+            "substitutions"
+          ],
+          "not": {
+            "required": [
+              "substitution"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "$comment": "The stage-2 runtime additionally rejects unknown fields at config, substitution, target_site, and parent_site levels to fail closed on misspellings such as site_selecton or selection_mode."
+}
